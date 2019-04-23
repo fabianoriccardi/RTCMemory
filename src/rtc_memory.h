@@ -16,8 +16,11 @@ class RtcMemory{
 
     /**
      * Call this function before every other methods.
+     * Return false if there is an fatal error during
+     * memory reading, true otherwise (first initialization
+     * fall in this case).
      */
-    void begin();
+    bool begin();
     
     /**
      * Write on RTC memory
@@ -25,24 +28,24 @@ class RtcMemory{
     bool save();
     
     /**
-     * Write on RTC memory and than on flash to allow a secondary backup. Still not fully implemented
+     * Write on RTC memory and than on flash to allow a secondary backup
      */
     bool persist();
 
     /**
-     * Get the raw data. You can modify it without restriction
+     * Get a pointer the raw data. You can modify it without restriction
      */
-    byte* getRtcData(){
-      if(ready){
-        return rtcData.data;
-      }
-      Serial.println("Call init before other calls!");
-      return nullptr;
-    }
+    byte* getRtcData();
 
   private:
     RtcData rtcData;
     bool ready;
+    
+    /**
+     * 0 - No output
+     * 1 - Only error
+     * 2 - Verbose output
+     */
     int verbosity;
     String filePath;
     const int dataLength = RTC_DATA_LENGTH;

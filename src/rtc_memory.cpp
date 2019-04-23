@@ -1,9 +1,9 @@
 #include "rtc_memory.h"
 #include <FS.h>
 
-void RtcMemory::begin(){
+bool RtcMemory::begin(){
   if(!ready){
-    if(verbosity > 0) Serial.print("Loading RTC memory... ");
+    if(verbosity > 1) Serial.print("Loading RTC memory... ");
 
     //In this case, I have to verify the memory crc.
     //If not verified, load the default value from the flash.
@@ -27,12 +27,14 @@ void RtcMemory::begin(){
       }
     }else{
       if(verbosity > 0) Serial.println("Read RTC memory failure");
+      return false;
     }
     ready=true;
-    if(verbosity > 0) Serial.println("Done!");
+    if(verbosity > 1) Serial.println("Done!");
   }else{
-    if(verbosity > 0) Serial.println("Rtc Memory already loaded");
+    if(verbosity > 1) Serial.println("Rtc Memory already loaded");
   }
+  return true;
 }
 
 bool RtcMemory::save(){
@@ -64,6 +66,14 @@ bool RtcMemory::persist(){
     if(verbosity > 0) Serial.println("Call init before other calls!");
   }
   return false;
+}
+
+byte* RtcMemory::getRtcData(){
+  if(ready){
+    return rtcData.data;
+  }
+  if(verbosity > 0) Serial.println("Call init before other calls!");
+  return nullptr;
 }
 
 RtcMemory::RtcMemory(String path, int verbosity):
