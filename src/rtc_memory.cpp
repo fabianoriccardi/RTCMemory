@@ -1,6 +1,7 @@
 #include "rtc_memory.h"
+#include <FS.h>
 
-void RtcMemory::init(){
+void RtcMemory::begin(){
   if(!ready){
     if(verbosity > 0) Serial.print("Loading RTC memory... ");
 

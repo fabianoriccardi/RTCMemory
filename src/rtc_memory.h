@@ -1,8 +1,7 @@
-#ifndef RTC_MEMORY
-#define RTC_MEMORY
+#ifndef RTC_MEMORY_H
+#define RTC_MEMORY_H
 
-#include "Arduino.h"
-#include "FS.h"
+#include <Arduino.h>
 
 const unsigned int RTC_DATA_LENGTH = 508;
 
@@ -11,7 +10,6 @@ struct RtcData{
   byte data[RTC_DATA_LENGTH];
 };
 
-
 class RtcMemory{
   public:
     RtcMemory(String path, int verbosity = 1);
@@ -19,7 +17,7 @@ class RtcMemory{
     /**
      * Call this function before every other methods.
      */
-    void init();
+    void begin();
     
     /**
      * Write on RTC memory
@@ -39,7 +37,7 @@ class RtcMemory{
         return rtcData.data;
       }
       Serial.println("Call init before other calls!");
-      return NULL;
+      return nullptr;
     }
 
   private:
@@ -71,4 +69,4 @@ class RtcMemory{
     
 };
 
-#endif
+#endif // END RTC_MEMORY_H
