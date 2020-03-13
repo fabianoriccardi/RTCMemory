@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+// The total RTC memory of ESP8266 is 512 bytes.
 const unsigned int RTC_DATA_LENGTH = 508;
 
 struct RtcData{
@@ -15,25 +16,26 @@ class RtcMemory{
     RtcMemory(String path, int verbosity = 1);
 
     /**
-     * Call this function before every other methods.
-     * Return false if there is an fatal error during
-     * memory reading, true otherwise (first initialization
-     * fall in this case).
+     * Initialize the RAM memory. Firstly, it tries to get data from RTC Memory.
+     * If not valid, try to load data from flash memory. If not valid, 
+     * reset the memory.
      */
     bool begin();
     
     /**
-     * Write on RTC memory
+     * Write data only on RTC memory.
+     * Return true is the operation is completed successfully, otherwise false.
      */
     bool save();
     
     /**
-     * Write on RTC memory and than on flash to allow a secondary backup
+     * Write on RTC memory and on flash. True if both write operations get
+     * successfully completed, otherwise false.
      */
     bool persist();
 
     /**
-     * Get a pointer the raw data. You can modify it without restriction
+     * Get a pointer the internal buffer.
      */
     byte* getRtcData();
 
@@ -51,25 +53,28 @@ class RtcMemory{
     const int dataLength = RTC_DATA_LENGTH;
 
     /**
-     * Load data from flash. return true in case of successfull reading.
+     * Load data from flash in RAM. 
+     * If the file is not found, an empty file is created and
+     * the RAM memory is reset. 
+     * True in case of successful reading, otherwise false.
      */
     bool readFromFlash();
 
     /**
-     * Very basic function to write from RAM to the flash.
+     * Write data from RAM to the flash.
+     * True on success, false otherwise.
      */
     bool writeToFlash();
 
     /**
-     * Calculate the CRC (32bit)
+     * Calculate the CRC (32bit) of input memory.
      */
-    uint32_t calculateCRC32(const uint8_t *data, size_t length);
+    uint32_t calculateCRC32(const uint8_t *data, size_t length) const;
 
     /**
-     * Reset the RAM memory, write the proper crc32 value
+     * Reset the RAM memory.
      */
     void memoryReset();
-    
 };
 
 #endif // END RTC_MEMORY_H

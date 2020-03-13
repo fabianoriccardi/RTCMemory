@@ -5,8 +5,8 @@ bool RtcMemory::begin(){
   if(!ready){
     if(verbosity > 1) Serial.print("Loading RTC memory... ");
 
-    //In this case, I have to verify the memory crc.
-    //If not verified, load the default value from the flash.
+    // In this case, I have to verify the memory crc.
+    // If not verified, load the default value from the flash.
     if(ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))){
       uint32_t crcOfData = calculateCRC32(((uint8_t*) &rtcData) + 4, sizeof(rtcData) - 4);
       if(verbosity > 1){
@@ -123,7 +123,7 @@ bool RtcMemory::writeToFlash(){
   }
 }
 
-uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length){
+uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length) const {
   uint32_t crc = 0xffffffff;
   while (length--) {
     uint8_t c = *data++;
