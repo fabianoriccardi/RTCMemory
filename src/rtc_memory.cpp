@@ -2,38 +2,47 @@
 #include <FS.h>
 
 bool RtcMemory::begin(){
-  if(!ready){
-    if(verbosity > 1) Serial.print("Loading RTC memory... ");
+  if (ready) {
+    if (verbosity > 1) Serial.println("Rtc Memory already loaded");
+    return true;
+  }
 
-    // In this case, I have to verify the memory crc.
-    // If not verified, load the default value from the flash.
-    if(ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))){
-      uint32_t crcOfData = calculateCRC32(((uint8_t*) &rtcData) + 4, sizeof(rtcData) - 4);
-      if(verbosity > 1){
-        Serial.print("CRC32 of data: ");
-        Serial.println(crcOfData, HEX);
-        Serial.print("CRC32 read from RTC: ");
-        Serial.println(rtcData.crc32, HEX);
-      }
-      if (crcOfData != rtcData.crc32) {
-        if(verbosity > 0) Serial.print("CRC32 in RTC memory doesn't match CRC32 of data. Data is probably invalid! reading from flash..");
-        if(readFromFlash()){
-          if(verbosity > 1) Serial.println("Loading backup from FLASH ok");
-        }else{
-          if(verbosity > 0) Serial.println("Loading backup from FLASH NOT ok, data are loaded and resetted");
-        }
-      }else {
-        if(verbosity > 1) Serial.println("The CRC is correct, the data are probably correct");
-      }
-    }else{
-      if(verbosity > 0) Serial.println("Read RTC memory failure");
+  if (verbosity > 1) Serial.print("Loading RTC memory... ");
+
+  // In this case, I have to verify the memory crc.
+  // If not verified, load the default value from the flash.
+  if (!ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData)))  {
+    if (verbosity > 0) Serial.println("Read RTC memory failure");
+    return false;
+  }
+
+  uint32_t crcOfData = calculateCRC32(((uint8_t*) &rtcData) + 4, sizeof(rtcData) - 4);
+  if (verbosity > 1) {
+    Serial.print("CRC32 of data: ");
+    Serial.println(crcOfData, HEX);
+    Serial.print("CRC32 read from RTC: ");
+    Serial.println(rtcData.crc32, HEX);
+  }
+  
+  // The RTCs works, user can get the reserved memory.
+  ready = true;
+
+  if (crcOfData != rtcData.crc32) {
+    if (verbosity > 0) Serial.print("CRC32 in RTC memory doesn't match CRC32 of data. Data is probably invalid! reading from flash..");
+    
+    if (readFromFlash()) {
+      if (verbosity > 1) Serial.println("Loading backup from FLASH ok");
+    } else {
+      if (verbosity > 0) Serial.println("Loading backup from FLASH NOT ok, data are loaded and resetted");
+      memoryReset();
+      writeToFlash();
       return false;
     }
-    ready=true;
-    if(verbosity > 1) Serial.println("Done!");
-  }else{
-    if(verbosity > 1) Serial.println("Rtc Memory already loaded");
+  } else {
+    if (verbosity > 1) Serial.println("The CRC is correct, the data are probably correct");
   }
+  
+  if(verbosity > 1) Serial.println("Done!");
   return true;
 }
 
@@ -57,13 +66,13 @@ bool RtcMemory::save(){
 }
 
 bool RtcMemory::persist(){
-  if(ready){
-    bool res=save();
-    if(res){
+  if (ready) {
+    bool res = save();
+    if (res) {
       return writeToFlash();
     }
-  }else{
-    if(verbosity > 0) Serial.println("Call init before other calls!");
+  } else {
+    if (verbosity > 0) Serial.println("Call init before other calls!");
   }
   return false;
 }
@@ -82,6 +91,12 @@ RtcMemory::RtcMemory(String path):
 
 bool RtcMemory::readFromFlash(){
   if(verbosity > 1) Serial.print(String("Setting ") + filePath + "... ");
+  
+  if(filePath.length() == 0){
+    if(verbosity > 1) Serial.print("no filepath was set");
+    return false;
+  }
+
   //check if the file exists
   File f;  
   if(SPIFFS.exists(filePath)){
@@ -91,26 +106,26 @@ bool RtcMemory::readFromFlash(){
       if(verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
       f.close();
       if(byteRead!=dataLength+4){
-        memoryReset();
-        writeToFlash(); 
+        
         return false;
       }
     }else{
       if(verbosity > 0) Serial.println(String("Error in opening: ")+ filePath);
-      memoryReset();
-      writeToFlash();    
       return false;
     }
   }else{
     if(verbosity > 0) Serial.println("File not existing");
-    memoryReset();  
-    writeToFlash();
     return false;
   }
   return true;
 }
 
 bool RtcMemory::writeToFlash(){
+  if(filePath.length() == 0){
+    if(verbosity > 1) Serial.print("no filepath was set");
+    return false;
+  }
+
   File f = SPIFFS.open(filePath,"w");
   if(f){
     f.write((uint8_t*)&rtcData,dataLength+4);

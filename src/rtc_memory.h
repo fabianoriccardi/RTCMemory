@@ -15,6 +15,9 @@ public:
      * Initialize the RAM memory. Firstly, it tries to get data from RTC Memory.
      * If not valid, try to load data from flash memory. If not valid, 
      * reset the memory.
+     *
+     * Return true if previous user data are found, otherwise false (i.e. the memory
+     * is reset to all zeros, the user the init this memory depending on its need).
      */
     bool begin();
     
@@ -58,10 +61,14 @@ public:
     };
 
     RtcData rtcData;
+
+    /*
+     * Say if begin() was called, i.e. the RTC memory is ready to be used.
+     */
     bool ready;
     
     /**
-     * For develop
+     * For development:
      * 0 - No output (Default)
      * 1 - Only error
      * 2 - Verbose output
@@ -74,13 +81,13 @@ public:
      * Load data from flash in RAM. 
      * If the file is not found, an empty file is created and
      * the RAM memory is reset. 
-     * True in case of successful reading, otherwise false.
+     * True in case of successful reading, otherwise false (even if no filepath was set).
      */
     bool readFromFlash();
 
     /**
      * Write data from RAM to the flash.
-     * True on success, false otherwise.
+     * True on success, otherwise false (even if no filepath was set).
      */
     bool writeToFlash();
 
@@ -90,7 +97,7 @@ public:
     uint32_t calculateCRC32(const uint8_t *data, size_t length) const;
 
     /**
-     * Reset the RAM memory.
+     * Write all zeros in the RAM memory.
      */
     void memoryReset();
 };
