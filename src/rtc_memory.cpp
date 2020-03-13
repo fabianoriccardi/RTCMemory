@@ -76,10 +76,9 @@ byte* RtcMemory::getRtcData(){
   return nullptr;
 }
 
-RtcMemory::RtcMemory(String path, int verbosity):
-                      filePath(path),ready(false),verbosity(verbosity)
-{  
-}
+RtcMemory::RtcMemory(String path):
+                      filePath(path), ready(false)
+{}
 
 bool RtcMemory::readFromFlash(){
   if(verbosity > 1) Serial.print(String("Setting ") + filePath + "... ");

@@ -9,7 +9,7 @@ const unsigned int RTC_DATA_LENGTH = 508;
 
 class RtcMemory{
 public:
-    RtcMemory(String path, int verbosity = 1);
+    RtcMemory(String path = "");
 
     /**
      * Initialize the RAM memory. Firstly, it tries to get data from RTC Memory.
@@ -61,11 +61,12 @@ public:
     bool ready;
     
     /**
-     * 0 - No output
+     * For develop
+     * 0 - No output (Default)
      * 1 - Only error
      * 2 - Verbose output
      */
-    int verbosity;
+    const int verbosity = 0;
     String filePath;
     const int dataLength = RTC_DATA_LENGTH;
 
