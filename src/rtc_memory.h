@@ -1,18 +1,14 @@
 #ifndef RTC_MEMORY_H
 #define RTC_MEMORY_H
 
+#include <type_traits>
 #include <Arduino.h>
 
 // The total RTC memory of ESP8266 is 512 bytes.
 const unsigned int RTC_DATA_LENGTH = 508;
 
-struct RtcData{
-  uint32_t crc32;
-  byte data[RTC_DATA_LENGTH];
-};
-
 class RtcMemory{
-  public:
+public:
     RtcMemory(String path, int verbosity = 1);
 
     /**
@@ -35,11 +31,32 @@ class RtcMemory{
     bool persist();
 
     /**
-     * Get a pointer the internal buffer.
+     * Get a pointer the internal buffer. You should consider getData() method.
      */
-    byte* getRtcData();
+    byte* getRtcData() __attribute__((deprecated));
+
+    /**
+     * Get a pointer the internal buffer, structured accordigly the
+     * speciliazed template. Return nullptr if you didn't initialized
+     * this object.
+     */
+    template<typename T>
+    T* getData() {
+        static_assert(sizeof(T) <= sizeof(RtcData::data), "Error: max size is 508 Byte");
+
+        if (ready) {
+            return reinterpret_cast<T*>(rtcData.data);
+        }
+    	if(verbosity > 0) Serial.println("Call init before other calls!");
+        return nullptr;
+    };
 
   private:
+    struct RtcData {
+      uint32_t crc32;
+      byte data[RTC_DATA_LENGTH];
+    };
+
     RtcData rtcData;
     bool ready;
     

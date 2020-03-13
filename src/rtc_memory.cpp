@@ -87,7 +87,7 @@ bool RtcMemory::readFromFlash(){
   File f;  
   if(SPIFFS.exists(filePath)){
     f = SPIFFS.open(filePath,"r");
-    if(f!=NULL){
+    if(f){
       int byteRead = f.read((uint8_t*)&rtcData,dataLength+4);
       if(verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
       f.close();
@@ -113,7 +113,7 @@ bool RtcMemory::readFromFlash(){
 
 bool RtcMemory::writeToFlash(){
   File f = SPIFFS.open(filePath,"w");
-  if(f!=NULL){
+  if(f){
     f.write((uint8_t*)&rtcData,dataLength+4);
     f.close();
     return true;
