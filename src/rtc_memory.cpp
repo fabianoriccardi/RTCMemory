@@ -86,7 +86,7 @@ byte* RtcMemory::getRtcData(){
 }
 
 RtcMemory::RtcMemory(String path):
-                      filePath(path), ready(false)
+                      ready(false), filePath(path)
 {}
 
 bool RtcMemory::readFromFlash(){
@@ -157,7 +157,7 @@ uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length) const {
 
 void RtcMemory::memoryReset(){
   //Just to reset the RAM memory
-  for(int i=0;i<sizeof(RtcData)/sizeof(unsigned int);i++){
+  for(unsigned int i=0;i<sizeof(RtcData)/sizeof(unsigned int);i++){
     ((unsigned int*)&rtcData)[i]=0;
   }
   uint32_t result=calculateCRC32((uint8_t*)rtcData.data,dataLength);
