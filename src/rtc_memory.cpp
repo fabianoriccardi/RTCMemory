@@ -1,6 +1,18 @@
 #include "rtc_memory.h"
 #include <FS.h>
 
+// Select (uncomment) ONLY ONE file system 
+//(NOTE: SPIFFS is deprecated but working)
+#define ESP_LOGGER_FLASH_FS_SPIFFS 
+//#define ESP_LOGGER_FLASH_FS_LITTLEFS
+
+#ifdef ESP_LOGGER_FLASH_FS_SPIFFS
+#define ESP_LOGGER_FLASH_FS SPIFFS
+#elif defined(ESP_LOGGER_FLASH_FS_LITTLEFS)
+#define ESP_LOGGER_FLASH_FS LittleFS
+#include <LittleFS.h>
+#endif
+
 bool RtcMemory::begin(){
   if (ready) {
     if (verbosity > 1) Serial.println("Rtc Memory already loaded");
@@ -99,8 +111,8 @@ bool RtcMemory::readFromFlash(){
 
   //check if the file exists
   File f;  
-  if(SPIFFS.exists(filePath)){
-    f = SPIFFS.open(filePath,"r");
+  if(ESP_LOGGER_FLASH_FS.exists(filePath)){
+    f = ESP_LOGGER_FLASH_FS.open(filePath,"r");
     if(f){
       int byteRead = f.read((uint8_t*)&rtcData,dataLength+4);
       if(verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
@@ -126,7 +138,7 @@ bool RtcMemory::writeToFlash(){
     return false;
   }
 
-  File f = SPIFFS.open(filePath,"w");
+  File f = ESP_LOGGER_FLASH_FS.open(filePath,"w");
   if(f){
     f.write((uint8_t*)&rtcData,dataLength+4);
     f.close();
