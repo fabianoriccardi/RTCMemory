@@ -1,0 +1,48 @@
+{
+  "name": "RTCMemory",
+  "version": "1.0.0",
+  "authors": {
+    "name": "Fabiano Riccardi",
+    "email": "fabiano.riccardi@outlook.com"
+  },
+  "description": "A class to facilitate the management of data persistence across different memory hierarchy (RAM, RTC memory and flash memory) on ESP8266.",
+  "keywords": [
+    "rtc-memory",
+    "esp8266",
+    "data",
+    "low-power-memory"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabiuz7/rtc-memory-esp8266"
+  },
+  "frameworks": [
+    "arduino"
+  ],
+  "platforms": [
+    "espressif8266"
+  ],
+  "examples": [
+    {
+      "name": "rtc_memory_basic",
+      "base": "examples/rtc_memory_basic",
+      "files": [
+        "rtc_memory_basic.ino"
+      ]
+    },
+    {
+      "name": "rtc_memory_benchmark",
+      "base": "examples/rtc_memory_benchmark",
+      "files": [
+        "rtc_memory_benchmark.ino"
+      ]
+    },
+    {
+      "name": "rtc_memory_with_backup",
+      "base": "examples/rtc_memory_with_backup",
+      "files": [
+        "rtc_memory_with_backup.ino"
+      ]
+    }
+  ]
+}
