@@ -16,6 +16,7 @@
     "type": "git",
     "url": "https://github.com/fabiuz7/rtc-memory-esp8266"
   },
+  "license": "LGPL-2.1-or-later",
   "frameworks": [
     "arduino"
   ],
