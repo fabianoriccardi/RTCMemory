@@ -43,14 +43,14 @@ bool RtcMemory::begin() {
 
   // In this case, I have to verify the memory crc.
   // If not verified, load the default value from the flash.
-  if (!ESP.rtcUserMemoryRead(0, (uint32_t *)&rtcData, sizeof(rtcData))) {
+  if (!ESP.rtcUserMemoryRead(0, (uint32_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE)) {
     if (verbosity > 0)
       Serial.println("Read RTC memory failure");
     return false;
   }
 
   uint32_t crcOfData =
-      calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
+      calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
   if (verbosity > 1) {
     Serial.print("CRC32 of data: ");
     Serial.println(crcOfData, HEX);
@@ -91,10 +91,11 @@ bool RtcMemory::save() {
   if (ready) {
     // update the crc32
     uint32_t crcOfData =
-        calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
+        calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
     rtcData.crc32 = crcOfData;
 
-    if (ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData))) {
+    if (ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData,
+                               TOTAL_RTC_MEMORY_SIZE)) {
       if (verbosity > 1)
         Serial.println("Write to RtcMemory done");
       return true;
@@ -147,11 +148,11 @@ bool RtcMemory::readFromFlash() {
   if (ESP_LOGGER_FLASH_FS.exists(filePath)) {
     f = ESP_LOGGER_FLASH_FS.open(filePath, "r");
     if (f) {
-      int byteRead = f.read((uint8_t *)&rtcData, dataLength + 4);
+      int byteRead = f.read((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
       if (verbosity > 1)
         Serial.println(String("Bytes read:") + byteRead);
       f.close();
-      if (byteRead != dataLength + 4) {
+      if (byteRead != TOTAL_RTC_MEMORY_SIZE) {
 
         return false;
       }
@@ -177,7 +178,7 @@ bool RtcMemory::writeToFlash() {
 
   File f = ESP_LOGGER_FLASH_FS.open(filePath, "w");
   if (f) {
-    f.write((uint8_t *)&rtcData, dataLength + 4);
+    f.write((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
     f.close();
     return true;
   } else {
@@ -207,10 +208,8 @@ uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length) const {
 }
 
 void RtcMemory::memoryReset() {
-  // Just to reset the RAM memory
-  for (unsigned int i = 0; i < sizeof(RtcData) / sizeof(unsigned int); i++) {
-    ((unsigned int *)&rtcData)[i] = 0;
-  }
-  uint32_t result = calculateCRC32((uint8_t *)rtcData.data, dataLength);
+  memset((void *)&rtcData, 0, TOTAL_RTC_MEMORY_SIZE);
+  uint32_t result =
+      calculateCRC32((uint8_t *)rtcData.data, USER_RTC_MEMORY_SIZE);
   rtcData.crc32 = result;
 }

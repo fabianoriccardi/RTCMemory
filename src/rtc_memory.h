@@ -79,15 +79,26 @@ public:
     if (ready) {
       return reinterpret_cast<T *>(rtcData.data);
     }
+
     if (verbosity > 0)
       Serial.println("Call init before other calls!");
     return nullptr;
   };
 
 private:
+  /**
+   * Size of user memory.
+   */
+  const static unsigned int USER_RTC_MEMORY_SIZE = 508;
+
+  /**
+   * Size of RTC memory (including CRC).
+   */
+  const static unsigned int TOTAL_RTC_MEMORY_SIZE = USER_RTC_MEMORY_SIZE + 4;
+
   struct RtcData {
     uint32_t crc32;
-    byte data[RTC_DATA_LENGTH];
+    byte data[USER_RTC_MEMORY_SIZE];
   };
 
   RtcData rtcData;
@@ -105,7 +116,6 @@ private:
    */
   const int verbosity = 0;
   String filePath;
-  const int dataLength = RTC_DATA_LENGTH;
 
   /**
    * Load data from flash to RAM. If the file is not found, an empty file is
