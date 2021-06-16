@@ -1,12 +1,12 @@
 /******************************************************
- * A simple sketch to demostrate how to persist (backup)
- * data on Flash memory.
+ * This sketch shows how to use the RTC memory and how
+ * to backup and retrieve data from flash memory.
  ******************************************************/
 #include <FS.h>
 #include <rtc_memory.h>
 
-// Define a struct that map what's inside the RTC memory
-// Remember that this struct must take max 508 bytes.
+// Define a struct that maps what's inside the RTC memory
+// Max size is 508 bytes.
 typedef struct {
   int counter;
 } MyData;
@@ -20,8 +20,8 @@ void setup() {
 
   Serial.println();
   Serial.println("RTC Memory - Basic with Backup");
-  // This cycle is to avoid that the code starts
-  // without the human intervention
+  // This cycle is to avoid that the code starts when serial monitor is not
+  // opened
   Serial.println("Press 's' to start the sketch");
   while (1) {
     delay(10);
@@ -56,12 +56,12 @@ void setup() {
   data = rtcMemory.getData<MyData>();
   Serial.println(String("Value read: ") + data->counter);
 
-  // Modify some data
+  // Modify data
   data->counter++;
   Serial.println(String("Incremented value: ") + data->counter);
 
-  // Persist the data in RTC and in flash memory
-  // You will get back the data even if you turn off your device.
+  // Persist data in RTC and in flash memory
+  // It preserves data even on power loss
   rtcMemory.persist();
 
   delay(10000);

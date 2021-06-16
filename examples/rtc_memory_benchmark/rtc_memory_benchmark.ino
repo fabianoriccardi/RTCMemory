@@ -1,6 +1,6 @@
 /***************************************************************
- * Benchmarks of the functionalities offered by RTC Memory Library.
- * They enphatize the different performances between the memories
+ * Benchmark of the APIs offered by RTC Memory.
+ * It shows the different performances between the memories
  * involved various init/read/write operations.
  ***************************************************************/
 #include <FS.h>
@@ -14,8 +14,8 @@ void setup() {
   Serial.println();
   Serial.println("RTC Memory - Benchmark");
 
-  // This cycle is to avoid that the code starts
-  // without the human intervention
+  // This cycle is to avoid that the code starts when serial monitor is not
+  // opened
   Serial.println("Press 's' to start the benchmark");
   while (1) {
     delay(10);
@@ -44,7 +44,7 @@ void setup() {
   start = micros();
   rtcMem.begin();
   end = micros();
-  Serial.println(String("The initilization had taken: ") + (end - start) +
+  Serial.println(String("The initialization had taken: ") + (end - start) +
                  "us");
 
   // Get the data

@@ -143,7 +143,6 @@ bool RtcMemory::readFromFlash() {
     return false;
   }
 
-  // check if the file exists
   File f;
   if (ESP_LOGGER_FLASH_FS.exists(filePath)) {
     f = ESP_LOGGER_FLASH_FS.open(filePath, "r");

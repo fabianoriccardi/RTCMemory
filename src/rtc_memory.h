@@ -22,11 +22,19 @@
 #include <Arduino.h>
 #include <type_traits>
 
-// The total RTC memory of ESP8266 is 512 bytes.
-const unsigned int RTC_DATA_LENGTH = 508;
+/**
+ * Max size of user data.
+ *
+ * Keep for compatibility with old releases.
+ */
+const static unsigned int RTC_DATA_LENGTH = 508;
 
 class RtcMemory {
 public:
+  /**
+   * Create RtcMemory instance.
+   * Set a valid filepath to backup RTC memory on flash memory.
+   */
   RtcMemory(String path = "");
 
   /**
@@ -42,25 +50,27 @@ public:
 
   /**
    * Write data only on RTC memory.
-   * Return true is the operation is completed successfully, otherwise false.
+   *
+   * Return true if the operation is completed successfully, otherwise false.
    */
   bool save();
 
   /**
-   * Write on RTC memory and on flash. True if both write operations get
-   * successfully completed, otherwise false.
+   * Write on RTC memory and on flash.
+   *
+   * Return true if both write operations are completed successfully, otherwise
+   * false.
    */
   bool persist();
 
   /**
-   * Get a pointer the internal buffer. You should consider getData() method.
+   * Get a pointer to the internal buffer. You should use getData() method.
    */
   byte *getRtcData() __attribute__((deprecated));
 
   /**
-   * Get a pointer the internal buffer, structured accordigly the
-   * speciliazed template. Return nullptr if you didn't initialized
-   * this object.
+   * Get a pointer to the internal buffer, structured accordigly the
+   * specialized template. Return nullptr if you didn't call begin().
    */
   template <typename T> T *getData() {
     static_assert(sizeof(T) <= sizeof(RtcData::data),
@@ -98,22 +108,24 @@ private:
   const int dataLength = RTC_DATA_LENGTH;
 
   /**
-   * Load data from flash in RAM.
-   * If the file is not found, an empty file is created and
-   * the RAM memory is reset.
-   * True in case of successful reading, otherwise false (even if no filepath
-   * was set).
+   * Load data from flash to RAM. If the file is not found, an empty file is
+   * created and the RAM memory is reset.
+   *
+   * Return true if read is completed successfully, otherwise false.
    */
   bool readFromFlash();
 
   /**
-   * Write data from RAM to the flash.
-   * True on success, otherwise false (even if no filepath was set).
+   * Write data from RAM to flash.
+   *
+   * Return true on success, otherwise false (even if no filepath was set).
    */
   bool writeToFlash();
 
   /**
    * Calculate the CRC (32bit) of input memory.
+   *
+   * Return the CRC code.
    */
   uint32_t calculateCRC32(const uint8_t *data, size_t length) const;
 

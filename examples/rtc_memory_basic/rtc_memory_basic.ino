@@ -1,11 +1,12 @@
 /******************************************************
- * A simple sketch to demostrate functionalities
- * offered by RTC Memory Library.
+ * This sketch shows how to use the RTC memory
+ * without backup on flash memory. You will lose data
+ * on RTC memory on power loss.
  ******************************************************/
 #include <rtc_memory.h>
 
-// Define a struct that map what's inside the RTC memory
-// Remember that this struct must take max 508 bytes.
+// Define a struct that maps what's inside the RTC memory
+// Max size is 508 bytes.
 typedef struct {
   int counter;
 } MyData;
@@ -19,8 +20,8 @@ void setup() {
 
   Serial.println();
   Serial.println("RTC Memory - Basic");
-  // This cycle is to avoid that the code starts
-  // without the human intervention
+  // This cycle is to avoid that the code starts when serial monitor is not
+  // opened
   Serial.println("Press 's' to start the sketch");
   while (1) {
     delay(10);
@@ -35,14 +36,14 @@ void setup() {
     Serial.println("No previous data found. The memory is reset to zeros!");
   }
 
-  // Get the data
+  // Get data
   MyData *data = rtcMemory.getData<MyData>();
 
   // Modify data
   data->counter++;
   Serial.println(String("Value to persist: ") + data->counter);
 
-  // Save the data in the rtc memory
+  // Save data
   rtcMemory.save();
 
   delay(10000);
