@@ -114,7 +114,8 @@ private:
    * 1 - Only error
    * 2 - Verbose output
    */
-  const int verbosity = 0;
+  const static int verbosity = 0;
+
   String filePath;
 
   /**
