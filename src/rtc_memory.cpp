@@ -34,15 +34,13 @@
 bool RtcMemory::begin() {
   if (ready) {
     if (verbosity > 1)
-      Serial.println("Rtc Memory already loaded");
+      Serial.println("Instance already initialized");
     return true;
   }
 
   if (verbosity > 1)
     Serial.print("Loading RTC memory... ");
 
-  // In this case, I have to verify the memory crc.
-  // If not verified, load the default value from the flash.
   if (!ESP.rtcUserMemoryRead(0, (uint32_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE)) {
     if (verbosity > 0)
       Serial.println("Read RTC memory failure");
@@ -52,34 +50,33 @@ bool RtcMemory::begin() {
   uint32_t crcOfData =
       calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
   if (verbosity > 1) {
-    Serial.print("CRC32 of data: ");
+    Serial.print("Calculated CRC: ");
     Serial.println(crcOfData, HEX);
-    Serial.print("CRC32 read from RTC: ");
+    Serial.print("CRC read from RTC memory: ");
     Serial.println(rtcData.crc32, HEX);
   }
 
-  // The RTCs works, user can get the reserved memory.
+  // The RTC memory retrieved, user can access to it
   ready = true;
 
   if (crcOfData != rtcData.crc32) {
     if (verbosity > 0)
-      Serial.print("CRC32 in RTC memory doesn't match CRC32 of data. Data is "
-                   "probably invalid! reading from flash..");
+      Serial.print("CRC in RTC memory doesn't match calculated CRC. Data are "
+                   "invalid! Trying to restore backup from flash memory..");
 
     if (readFromFlash()) {
       if (verbosity > 1)
-        Serial.println("Loading backup from FLASH ok");
+        Serial.println("Loading backup from flash ok");
     } else {
       if (verbosity > 0)
-        Serial.println(
-            "Loading backup from FLASH NOT ok, data are loaded and resetted");
+        Serial.println("Loading backup from flash FAILED, data are resetted");
       memoryReset();
       writeToFlash();
       return false;
     }
   } else {
     if (verbosity > 1)
-      Serial.println("The CRC is correct, the data are probably correct");
+      Serial.println("CRC is correct");
   }
 
   if (verbosity > 1)
@@ -89,7 +86,6 @@ bool RtcMemory::begin() {
 
 bool RtcMemory::save() {
   if (ready) {
-    // update the crc32
     uint32_t crcOfData =
         calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
     rtcData.crc32 = crcOfData;
@@ -97,15 +93,16 @@ bool RtcMemory::save() {
     if (ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData,
                                TOTAL_RTC_MEMORY_SIZE)) {
       if (verbosity > 1)
-        Serial.println("Write to RtcMemory done");
+        Serial.println("Write to RTC memory done");
       return true;
     } else {
       if (verbosity > 0)
-        Serial.println("Write to RtcMemory NOT done");
+        Serial.println("Write to RTC memory failed");
       return false;
     }
   } else {
-    Serial.println("Call init before other calls!");
+    if (verbosity > 0)
+      Serial.println("Call begin() before using this method");
     return false;
   }
 }
@@ -118,7 +115,7 @@ bool RtcMemory::persist() {
     }
   } else {
     if (verbosity > 0)
-      Serial.println("Call init before other calls!");
+      Serial.println("Call begin() before using this method");
   }
   return false;
 }
@@ -128,7 +125,7 @@ byte *RtcMemory::getRtcData() {
     return rtcData.data;
   }
   if (verbosity > 0)
-    Serial.println("Call init before other calls!");
+    Serial.println("Call begin() before using this method");
   return nullptr;
 }
 
@@ -136,11 +133,11 @@ RtcMemory::RtcMemory(String path) : ready(false), filePath(path) {}
 
 bool RtcMemory::readFromFlash() {
   if (verbosity > 1)
-    Serial.print(String("Setting ") + filePath + "... ");
+    Serial.print(String("Reading from ") + filePath + "... ");
 
   if (filePath.length() == 0) {
     if (verbosity > 1)
-      Serial.print("no filepath was set");
+      Serial.println("No filepath was set");
     return false;
   }
 
@@ -153,12 +150,11 @@ bool RtcMemory::readFromFlash() {
         Serial.println(String("Bytes read:") + byteRead);
       f.close();
       if (byteRead != TOTAL_RTC_MEMORY_SIZE) {
-
         return false;
       }
     } else {
       if (verbosity > 0)
-        Serial.println(String("Error in opening: ") + filePath);
+        Serial.println(String("Error opening file: ") + filePath);
       return false;
     }
   } else {
@@ -170,9 +166,12 @@ bool RtcMemory::readFromFlash() {
 }
 
 bool RtcMemory::writeToFlash() {
+  if (verbosity > 1)
+    Serial.print(String("Writing to ") + filePath + "... ");
+
   if (filePath.length() == 0) {
     if (verbosity > 1)
-      Serial.print("no filepath was set");
+      Serial.print("No filepath was set");
     return false;
   }
 
@@ -183,8 +182,7 @@ bool RtcMemory::writeToFlash() {
     return true;
   } else {
     if (verbosity > 0)
-      Serial.println(
-          "Error in writing the flash. Is the filesystem initialized?");
+      Serial.println("Error writing file. Is the filesystem initialized?");
     return false;
   }
 }
