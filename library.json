@@ -5,7 +5,7 @@
     "name": "Fabiano Riccardi",
     "email": "fabiano.riccardi@outlook.com"
   },
-  "description": "A class to facilitate the management of data persistence across different memory hierarchy (RAM, RTC memory and flash memory) on ESP8266.",
+  "description": "Efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.",
   "keywords": [
     "rtc-memory",
     "esp8266",
