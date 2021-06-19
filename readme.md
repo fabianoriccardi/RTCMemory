@@ -15,6 +15,16 @@ RTC Memory is a library to efficiently manage the different levels of data persi
 - Save data on different memories only when needed
 - Compatibility with SPIFFS and LittleFS file systems
 
+## Installation
+
+You can find RTC Memory on Arduino and PlatformIO library registries. You can install it through your favorite IDEs, or you can use the respective command-line tools running:
+
+    arduino-cli lib install RTCMemory
+
+or:
+
+    pio lib install "fabiuz7/RTCMemory"
+
 ## Usage
 
 You should be aware of very few APIs to effectively use RTC Memory.  
