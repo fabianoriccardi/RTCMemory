@@ -1,0 +1,60 @@
+# This is the name of the workflow, visible on GitHub UI
+name: Test Library's Examples
+on:
+  push: # see: https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request
+    paths:
+      - '**.ino'
+      - '**.cpp'
+      - '**.h'
+      - '**CompileLibraryExamples.yml'
+  pull_request:
+
+jobs:
+  build:
+    name: ${{ matrix.arduino-platform }} - test compiling examples
+
+    # Target OS
+    runs-on: ubuntu-20.04
+
+    env:
+      # Comma separated list without double quotes around the list
+      REQUIRED_LIBRARIES: RTCMemory
+
+    strategy:
+      # The Matrix contains all the configuration to be tested. For each configuration, all the examples are tested
+      matrix:
+
+        # A couple of configuration for testing the library
+        arduino-platform:
+          - esp8266:esp8266@2.7.4
+          - esp8266:esp8266@3.0.0
+
+        platform-url:
+          - https://arduino.esp8266.com/stable/package_esp8266com_index.json
+        # In arduino-boards-fqbn you can specify additional hardware parameters,
+        # like clock frequency or partition scheme
+        # Type "arduino-cli board listall" to view the available boards
+        arduino-boards-fqbn: 
+          - esp8266:esp8266:generic
+            
+      # Do not cancel all jobs / architectures if one job fails
+      fail-fast: false
+
+    # This is the list of steps this job will run
+    steps:
+
+      # clone the repo using the `checkout` action
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Arduino Lint
+        uses: arduino/arduino-lint-action@v1
+        with:
+          library-manager: update
+
+      - name: Compile all examples using the arduino-test-compile action
+        uses: ArminJo/arduino-test-compile@v3.0.0
+        with:
+          arduino-board-fqbn: ${{ matrix.arduino-boards-fqbn }}
+          arduino-platform: ${{ matrix.arduino-platform }}
+          platform-url: ${{ matrix.platform-url }}
