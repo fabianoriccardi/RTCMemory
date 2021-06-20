@@ -1,8 +1,8 @@
-# RTC Memory
+# RTCMemory
 
 [![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabiuz7/rtc-memory-esp8266/actions/workflows/CompileLibraryExamples.yml/badge.svg)
 
-RTC Memory is a library to efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.
+RTCMemory is a library to efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.
 
 If you are wondering why you should consider an RTC memory or, in general, any low-power memory, you may watch this [video](https://www.youtube.com/watch?v=r-hEOL007nw).
 
@@ -19,7 +19,7 @@ If you are wondering why you should consider an RTC memory or, in general, any l
 
 ## Installation
 
-You can find RTC Memory on Arduino and PlatformIO library registries. You can install it through your favorite IDEs, or you can use the respective command-line tools running:
+You can find RTCMemory on Arduino and PlatformIO library registries. You can install it through your favorite IDEs, or you can use the respective command-line tools running:
 
     arduino-cli lib install RTCMemory
 
@@ -29,20 +29,20 @@ or:
 
 ## Usage
 
-You should be aware of very few APIs to effectively use RTC Memory.  
+You should be aware of very few APIs to effectively use RTCMemory.  
 First, define a data structure that will contains your data (max 508 bytes):
 
     typedef struct {
         int counter;
     } MyData;
 
-Then instantiate the rtcMemory (global scope is fine):
+Then instantiate `rtcMemory`:
 
     RtcMemory rtcMemory("/path/to/file");
 
-the filepath is an optional parameter, if you don't need the backup on flash memory you can omit it. Then, initialize RTC Memory through:
+the filepath is an optional parameter, if you don't need the backup on flash memory you can omit it. Then, initialize RTC memory through:
 
-    bool result = rtmMemory.begin();
+    bool result = rtcMemory.begin();
 
 `result` is true if there are valid data in RTC memory or, if RTC memory is not valid and a filepath was provided, in flash memory, otherwise is false.
 Get the memory area containing your data:

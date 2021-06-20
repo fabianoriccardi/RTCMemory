@@ -1,5 +1,5 @@
 /***************************************************************
- * Benchmark of the APIs offered by RTC Memory.
+ * Benchmark of the APIs offered by RTCMemory.
  * It shows the different performances between the memories
  * involved various init/read/write operations.
  ***************************************************************/
@@ -12,7 +12,7 @@ void setup() {
     ;
 
   Serial.println();
-  Serial.println("RTC Memory - Benchmark");
+  Serial.println("RTCMemory - Benchmark");
 
   // This cycle is to avoid that the code starts when serial monitor is not
   // opened

@@ -19,7 +19,7 @@ void setup() {
     ;
 
   Serial.println();
-  Serial.println("RTC Memory - Basic");
+  Serial.println("RTCMemory - Basic");
   // This cycle is to avoid that the code starts when serial monitor is not
   // opened
   Serial.println("Press 's' to start the sketch");
