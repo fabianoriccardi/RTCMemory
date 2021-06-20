@@ -1,6 +1,6 @@
 # RTCMemory
 
-[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabiuz7/rtc-memory-esp8266/actions/workflows/CompileLibraryExamples.yml/badge.svg)
+[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabianoriccardi/rtc-memory-esp8266/actions/workflows/CompileLibraryExamples.yml/badge.svg)
 
 RTCMemory is a library to efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.
 
@@ -25,7 +25,7 @@ You can find RTCMemory on Arduino and PlatformIO library registries. You can ins
 
 or:
 
-    pio lib install "fabiuz7/RTCMemory"
+    pio lib install "fabianoriccardi/RTCMemory"
 
 ## Usage
 
