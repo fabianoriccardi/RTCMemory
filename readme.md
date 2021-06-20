@@ -4,6 +4,8 @@
 
 RTC Memory is a library to efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.
 
+If you are wondering why you should consider an RTC memory or, in general, any low-power memory, you may watch this [video](https://www.youtube.com/watch?v=r-hEOL007nw).
+
 ## Motivation
 
 [ESP8266 Arduino core](https://github.com/esp8266/Arduino) provides *byte-oriented* functions to read, write, and check the integrity data on RTC memory. Hence, accessing data types such as string, integer, or float requires dealing with pointers and casting, leading to hard-to-find errors. So I created a snippet to make this process easier, more intuitive, and error-proof. Finally, I have come up with this library and some additional nice-to-have features such as backup on flash memory.
