@@ -21,12 +21,14 @@
 
 // Select (uncomment) ONLY ONE file system
 //(NOTE: SPIFFS is deprecated but working)
-#define ESP_LOGGER_FLASH_FS_SPIFFS
-//#define ESP_LOGGER_FLASH_FS_LITTLEFS
+#if !defined(ESP_LOGGER_FLASH_FS_USE_LITTLEFS) && !defined(ESP_LOGGER_FLASH_FS_USE_SPIFFS)
+#define ESP_LOGGER_FLASH_FS_USE_SPIFFS
+// #define ESP_LOGGER_FLASH_FS_USE_LITTLEFS
+#endif
 
-#ifdef ESP_LOGGER_FLASH_FS_SPIFFS
+#if defined(ESP_LOGGER_FLASH_FS_USE_SPIFFS)
 #define ESP_LOGGER_FLASH_FS SPIFFS
-#elif defined(ESP_LOGGER_FLASH_FS_LITTLEFS)
+#elif defined(ESP_LOGGER_FLASH_FS_USE_LITTLEFS)
 #define ESP_LOGGER_FLASH_FS LittleFS
 #include <LittleFS.h>
 #endif
