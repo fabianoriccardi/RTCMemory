@@ -72,16 +72,12 @@ public:
    * Get a pointer to the internal buffer, structured accordigly the
    * specialized template. Return nullptr if you didn't call begin().
    */
-  template <typename T> T *getData() {
-    static_assert(sizeof(T) <= sizeof(RtcData::data),
-                  "Error: max size is 508 Byte");
+  template<typename T> T *getData() {
+    static_assert(sizeof(T) <= sizeof(RtcData::data), "Error: max size is 508 Byte");
 
-    if (ready) {
-      return reinterpret_cast<T *>(rtcData.data);
-    }
+    if (ready) { return reinterpret_cast<T *>(rtcData.data); }
 
-    if (verbosity > 0)
-      Serial.println("Call init before other calls!");
+    if (verbosity > 0) Serial.println("Call init before other calls!");
     return nullptr;
   };
 
@@ -146,4 +142,4 @@ private:
   void memoryReset();
 };
 
-#endif // END RTC_MEMORY_H
+#endif  // END RTC_MEMORY_H

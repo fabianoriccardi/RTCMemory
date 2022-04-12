@@ -26,8 +26,7 @@ void setup() {
   while (1) {
     delay(10);
     char c = Serial.read();
-    if (c == 's')
-      break;
+    if (c == 's') break;
   }
 
   if (rtcMemory.begin()) {

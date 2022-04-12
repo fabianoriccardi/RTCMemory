@@ -20,8 +20,7 @@ void setup() {
   while (1) {
     delay(10);
     char c = Serial.read();
-    if (c == 's')
-      break;
+    if (c == 's') break;
   }
 
   // Remember to initialize the SPIFFS memory
@@ -44,8 +43,7 @@ void setup() {
   start = micros();
   rtcMem.begin();
   end = micros();
-  Serial.println(String("The initialization had taken: ") + (end - start) +
-                 "us");
+  Serial.println(String("The initialization had taken: ") + (end - start) + "us");
 
   // Get the data
   data = rtcMem.getData<byte>();
@@ -57,16 +55,13 @@ void setup() {
   start = micros();
   rtcMem.save();
   end = micros();
-  Serial.println(String("save() method (save only on RTC memory) had taken: ") +
-                 (end - start) + "us");
+  Serial.println(String("save() method (save only on RTC memory) had taken: ") + (end - start) + "us");
 
   // Persist the data in rtc mem and in flash
   start = micros();
   rtcMem.persist();
   end = micros();
-  Serial.println(
-      String("persist() method (save on RTC memory + flash) had taken: ") +
-      (end - start) + "us");
+  Serial.println(String("persist() method (save on RTC memory + flash) had taken: ") + (end - start) + "us");
 
   delay(10000);
   ESP.restart();
