@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2020-2021  Fabiano Riccardi                             *
+ *   Copyright (C) 2020-2022  Fabiano Riccardi                             *
  *                                                                         *
  *   This file is part of RTCMemory.                                       *
  *                                                                         *

@@ -1,49 +1,49 @@
 {
-  "name": "RTCMemory",
-  "version": "1.0.3",
-  "authors": {
-    "name": "Fabiano Riccardi",
-    "email": "fabiano.riccardi@outlook.com"
-  },
-  "description": "Efficiently manage the different levels of data persistence and speed offered by RAM, RTC memory, and flash memory on ESP8266.",
-  "keywords": [
-    "rtc-memory",
-    "esp8266",
-    "data",
-    "low-power-memory"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fabianoriccardi/rtcmemory-esp8266"
-  },
-  "license": "LGPL-2.1-or-later",
-  "frameworks": [
-    "arduino"
-  ],
-  "platforms": [
-    "espressif8266"
-  ],
-  "examples": [
-    {
-      "name": "rtc_memory_basic",
-      "base": "examples/rtc_memory_basic",
-      "files": [
-        "rtc_memory_basic.ino"
-      ]
+    "name": "RTCMemory",
+    "version": "1.0.3",
+    "authors": {
+        "name": "Fabiano Riccardi",
+        "email": "fabiano.riccardi@outlook.com"
     },
-    {
-      "name": "rtc_memory_benchmark",
-      "base": "examples/rtc_memory_benchmark",
-      "files": [
-        "rtc_memory_benchmark.ino"
-      ]
+    "description": "An intuitive library to simplify read and write operations on RTC Memory of ESP8266 and backup on flash memory.",
+    "keywords": [
+        "rtc-memory",
+        "esp8266",
+        "data",
+        "low-power-memory"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fabianoriccardi/RTCMemory"
     },
-    {
-      "name": "rtc_memory_with_backup",
-      "base": "examples/rtc_memory_with_backup",
-      "files": [
-        "rtc_memory_with_backup.ino"
-      ]
-    }
-  ]
+    "license": "LGPL-2.1-or-later",
+    "frameworks": [
+        "arduino"
+    ],
+    "platforms": [
+        "espressif8266"
+    ],
+    "examples": [
+        {
+            "name": "rtc_memory_basic",
+            "base": "examples/rtc_memory_basic",
+            "files": [
+                "rtc_memory_basic.ino"
+            ]
+        },
+        {
+            "name": "rtc_memory_with_backup",
+            "base": "examples/rtc_memory_with_backup",
+            "files": [
+                "rtc_memory_with_backup.ino"
+            ]
+        },
+        {
+            "name": "rtc_memory_benchmark",
+            "base": "examples/rtc_memory_benchmark",
+            "files": [
+                "rtc_memory_benchmark.ino"
+            ]
+        }
+    ]
 }
