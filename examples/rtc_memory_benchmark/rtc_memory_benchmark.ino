@@ -1,10 +1,9 @@
-/***************************************************************
- * Benchmark of the APIs offered by RTCMemory.
- * It shows the different performances between the memories
- * involved various init/read/write operations.
- ***************************************************************/
+/***********************************************************************
+ * Benchmark and test the APIs offered by RTCMemory.
+ * It shows the different speeds provided by RTC and flash memory.
+ ***********************************************************************/
 #include <FS.h>
-#include <rtc_memory.h>
+#include <RTCMemory.h>
 
 void setup() {
   Serial.begin(115200);
@@ -14,8 +13,7 @@ void setup() {
   Serial.println();
   Serial.println("RTCMemory - Benchmark");
 
-  // This cycle is to avoid that the code starts when serial monitor is not
-  // opened
+  // Stop the sketch until serial monitor is opened and user presses 's'
   Serial.println("Press 's' to start the benchmark");
   while (1) {
     delay(10);
@@ -33,11 +31,10 @@ void setup() {
 
   unsigned long start, end;
 
-  RtcMemory rtcMem("/etc/trial.bin");
+  RTCMemory rtcMem("/etc/rtc_mem.bin");
   byte *data = rtcMem.getData<byte>();
   if (data == nullptr) {
-    Serial.println("Error: In this case nullptr is correct, you have to "
-                   "explicitly initialize the class");
+    Serial.println("OK: here nullptr is expected, you have to initialize the instance explicitly");
   }
 
   start = micros();
@@ -45,23 +42,22 @@ void setup() {
   end = micros();
   Serial.println(String("The initialization had taken: ") + (end - start) + "us");
 
-  // Get the data
   data = rtcMem.getData<byte>();
-  // Modify some data
+  // Modify data
   data[0]++;
-  Serial.println(String("Value to persist: ") + data[0]);
+  Serial.println(String("Value to store: ") + data[0]);
 
-  // Save the data in the rtc memory
+  // Save the data to RTC memory
   start = micros();
   rtcMem.save();
   end = micros();
-  Serial.println(String("save() method (save only on RTC memory) had taken: ") + (end - start) + "us");
+  Serial.println(String("save() method (save to RTC memory) had taken: ") + (end - start) + "us");
 
-  // Persist the data in rtc mem and in flash
+  // Backup the data to flash memory
   start = micros();
-  rtcMem.persist();
+  rtcMem.backup();
   end = micros();
-  Serial.println(String("persist() method (save on RTC memory + flash) had taken: ") + (end - start) + "us");
+  Serial.println(String("backup() method (save to flash memory) had taken: ") + (end - start) + "us");
 
   delay(10000);
   ESP.restart();

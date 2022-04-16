@@ -1,9 +1,8 @@
-/******************************************************
- * This sketch shows how to use the RTC memory
- * without backup on flash memory. You will lose data
- * on RTC memory on power loss.
- ******************************************************/
-#include <rtc_memory.h>
+/*******************************************************************************
+ * This sketch shows the minimal usage of RTCMemory.
+ * NOTE: You will lose data on RTC memory if the device is not powered.
+ *******************************************************************************/
+#include <RTCMemory.h>
 
 // Define a struct that maps what's inside the RTC memory
 // Max size is 508 bytes.
@@ -11,7 +10,7 @@ typedef struct {
   int counter;
 } MyData;
 
-RtcMemory rtcMemory;
+RTCMemory rtcMemory;
 
 void setup() {
   Serial.begin(115200);
@@ -20,8 +19,8 @@ void setup() {
 
   Serial.println();
   Serial.println("RTCMemory - Basic");
-  // This cycle is to avoid that the code starts when serial monitor is not
-  // opened
+
+  // Stop the sketch until serial monitor is opened and user presses 's'
   Serial.println("Press 's' to start the sketch");
   while (1) {
     delay(10);
@@ -30,9 +29,10 @@ void setup() {
   }
 
   if (rtcMemory.begin()) {
-    Serial.println("Initialization done!");
+    Serial.println("Initialization done! Previous data found.");
   } else {
-    Serial.println("No previous data found. The memory is reset to zeros!");
+    Serial.println("Initialization done! No previous data found. The buffer is cleared.");
+    // Here you can initialize your data structure.
   }
 
   // Get data
@@ -40,7 +40,7 @@ void setup() {
 
   // Modify data
   data->counter++;
-  Serial.println(String("Value to persist: ") + data->counter);
+  Serial.println(String("Value to save: ") + data->counter);
 
   // Save data
   rtcMemory.save();

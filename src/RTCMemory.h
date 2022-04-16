@@ -16,64 +16,57 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with RTCMemory; if not, see <http://www.gnu.org/licenses/>      *
  ***************************************************************************/
-#ifndef RTC_MEMORY_H
-#define RTC_MEMORY_H
+#ifndef RTCMEMORY_H
+#define RTCMEMORY_H
 
 #include <Arduino.h>
 #include <type_traits>
 
-/**
- * Max size of user data.
- *
- * Keep for compatibility with old releases.
- */
-const static unsigned int RTC_DATA_LENGTH = 508;
-
-class RtcMemory {
+class RTCMemory {
 public:
   /**
-   * Create RtcMemory instance.
-   * Set a valid filepath to backup RTC memory on flash memory.
+   * Create RTCMemory. Set a valid filepath to enable the backup of RTC memory on flash memory.
    */
-  RtcMemory(String path = "");
+  RTCMemory(String path = "");
 
   /**
-   * Initialize the RAM memory. Firstly, it tries to get data from RTC memory.
-   * If not valid, try to load data from flash memory. If not valid,
-   * reset the memory.
+   * Initialize the buffer using data in RTC memory. If data are invalid, load data from
+   * flash. If it fails again, the buffer is cleared. After this call you can safely use this
+   * instance.
    *
-   * Return true if previous user data are found, otherwise false (i.e. the
-   * memory is reset to all zeros, the user the init this memory depending on
-   * its need).
+   * Return true if at least one data source is valid, otherwise false.
    */
   bool begin();
 
   /**
-   * Write data only on RTC memory.
+   * Write data to RTC memory.
    *
    * Return true if the operation is completed successfully, otherwise false.
    */
   bool save();
 
   /**
-   * Write on RTC memory and on flash.
+   * Write data to flash memory.
    *
-   * Return true if both write operations are completed successfully, otherwise
-   * false.
+   * Return true if the operation is completed successfully, otherwise false.
+   */
+  bool backup();
+
+  /**
+   * Write data to both RTC and flash RTCMemory. It is equivalent to subsequent call to save() and
+   * backup().
+   *
+   * Return true if both write operations are completed successfully, otherwise false.
    */
   bool persist();
 
   /**
-   * Get a pointer to the internal buffer. You should use getData() method.
-   */
-  byte *getRtcData() __attribute__((deprecated));
-
-  /**
-   * Get a pointer to the internal buffer, structured accordigly the
-   * specialized template. Return nullptr if you didn't call begin().
+   * Get a pointer to the user buffer, structured accordingly to the typename T.
+   *
+   * Return a valid pointer to the data if begin() was called, otherwise nullptr.
    */
   template<typename T> T *getData() {
-    static_assert(sizeof(T) <= sizeof(RtcData::data), "Error: max size is 508 Byte");
+    static_assert(sizeof(T) <= sizeof(RTCData::data), "Error: max size is 508 Byte");
 
     if (ready) { return reinterpret_cast<T *>(rtcData.data); }
 
@@ -83,63 +76,64 @@ public:
 
 private:
   /**
-   * Size of user memory.
+   * Max size of user memory.
    */
   const static unsigned int USER_RTC_MEMORY_SIZE = 508;
 
   /**
-   * Size of RTC memory (including CRC).
+   * Total size of RTC memory (including CRC).
    */
   const static unsigned int TOTAL_RTC_MEMORY_SIZE = USER_RTC_MEMORY_SIZE + 4;
 
-  struct RtcData {
+  struct RTCData {
     uint32_t crc32;
+    // The user buffer
     byte data[USER_RTC_MEMORY_SIZE];
   };
 
-  RtcData rtcData;
+  // The buffer
+  RTCData rtcData;
 
-  /*
-   * Say if begin() was called, i.e. the RTC memory is ready to be used.
+  /**
+   * Tell if this class is ready to be used i.e. if begin() was called.
    */
   bool ready;
 
   /**
-   * For development:
+   * Verbosity levels:
    * 0 - No output (Default)
-   * 1 - Only error
-   * 2 - Verbose output
+   * 1 - Only errors
+   * 2 - Debug
    */
   const static int verbosity = 0;
 
   String filePath;
 
   /**
-   * Load data from flash to RAM. If the file is not found, an empty file is
-   * created and the RAM memory is reset.
+   * Load data from flash.
    *
-   * Return true if read is completed successfully, otherwise false.
+   * Return true if it reads valid data, otherwise false (return false also if filepath is not set).
    */
   bool readFromFlash();
 
   /**
-   * Write data from RAM to flash.
+   * Save data to flash.
    *
-   * Return true on success, otherwise false (even if no filepath was set).
+   * Return true on success, otherwise false (return false also if filepath is not set).
    */
   bool writeToFlash();
 
   /**
-   * Calculate the CRC (32bit) of input memory.
+   * Calculate the CRC (32bit) of the given buffer.
    *
    * Return the CRC code.
    */
   uint32_t calculateCRC32(const uint8_t *data, size_t length) const;
 
   /**
-   * Write all zeros in the RAM memory.
+   * Clear the buffer.
    */
-  void memoryReset();
+  void clearBuffer();
 };
 
-#endif  // END RTC_MEMORY_H
+#endif  // END RTCMEMORY_H

@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with RTCMemory; if not, see <http://www.gnu.org/licenses/>      *
  ***************************************************************************/
-#include "rtc_memory.h"
+#include "RTCMemory.h"
 #include <FS.h>
 
 // Select (uncomment) ONLY ONE file system
@@ -31,7 +31,9 @@
 #include <LittleFS.h>
 #endif
 
-bool RtcMemory::begin() {
+RTCMemory::RTCMemory(String path) : ready(false), filePath(path) {}
+
+bool RTCMemory::begin() {
   if (ready) {
     if (verbosity > 1) Serial.println("Instance already initialized");
     return true;
@@ -44,7 +46,7 @@ bool RtcMemory::begin() {
     return false;
   }
 
-  uint32_t crcOfData = calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
+  uint32_t crcOfData = calculateCRC32((uint8_t *)&rtcData.data, USER_RTC_MEMORY_SIZE);
   if (verbosity > 1) {
     Serial.print("Calculated CRC: ");
     Serial.println(crcOfData, HEX);
@@ -52,7 +54,6 @@ bool RtcMemory::begin() {
     Serial.println(rtcData.crc32, HEX);
   }
 
-  // The RTC memory retrieved, user can access to it
   ready = true;
 
   if (crcOfData != rtcData.crc32) {
@@ -64,7 +65,7 @@ bool RtcMemory::begin() {
       if (verbosity > 1) Serial.println("Loading backup from flash ok");
     } else {
       if (verbosity > 0) Serial.println("Loading backup from flash FAILED, data are resetted");
-      memoryReset();
+      clearBuffer();
       writeToFlash();
       return false;
     }
@@ -76,9 +77,10 @@ bool RtcMemory::begin() {
   return true;
 }
 
-bool RtcMemory::save() {
+bool RTCMemory::save() {
+
   if (ready) {
-    uint32_t crcOfData = calculateCRC32(((uint8_t *)&rtcData.data), USER_RTC_MEMORY_SIZE);
+    uint32_t crcOfData = calculateCRC32((uint8_t *)&rtcData.data, USER_RTC_MEMORY_SIZE);
     rtcData.crc32 = crcOfData;
 
     if (ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE)) {
@@ -94,7 +96,16 @@ bool RtcMemory::save() {
   }
 }
 
-bool RtcMemory::persist() {
+bool RTCMemory::backup() {
+  if (ready) {
+    return writeToFlash();
+  } else {
+    if (verbosity > 0) Serial.println("Call begin() before using this method");
+  }
+  return false;
+}
+
+bool RTCMemory::persist() {
   if (ready) {
     bool res = save();
     if (res) { return writeToFlash(); }
@@ -104,15 +115,7 @@ bool RtcMemory::persist() {
   return false;
 }
 
-byte *RtcMemory::getRtcData() {
-  if (ready) { return rtcData.data; }
-  if (verbosity > 0) Serial.println("Call begin() before using this method");
-  return nullptr;
-}
-
-RtcMemory::RtcMemory(String path) : ready(false), filePath(path) {}
-
-bool RtcMemory::readFromFlash() {
+bool RTCMemory::readFromFlash() {
   if (verbosity > 1) Serial.print(String("Reading from ") + filePath + "... ");
 
   if (filePath.length() == 0) {
@@ -139,7 +142,7 @@ bool RtcMemory::readFromFlash() {
   return true;
 }
 
-bool RtcMemory::writeToFlash() {
+bool RTCMemory::writeToFlash() {
   if (verbosity > 1) Serial.print(String("Writing to ") + filePath + "... ");
 
   if (filePath.length() == 0) {
@@ -158,7 +161,7 @@ bool RtcMemory::writeToFlash() {
   }
 }
 
-uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length) const {
+uint32_t RTCMemory::calculateCRC32(const uint8_t *data, size_t length) const {
   uint32_t crc = 0xffffffff;
   while (length--) {
     uint8_t c = *data++;
@@ -172,7 +175,7 @@ uint32_t RtcMemory::calculateCRC32(const uint8_t *data, size_t length) const {
   return crc;
 }
 
-void RtcMemory::memoryReset() {
+void RTCMemory::clearBuffer() {
   memset((void *)&rtcData, 0, TOTAL_RTC_MEMORY_SIZE);
   uint32_t result = calculateCRC32((uint8_t *)rtcData.data, USER_RTC_MEMORY_SIZE);
   rtcData.crc32 = result;
