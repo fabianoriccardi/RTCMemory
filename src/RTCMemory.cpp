@@ -19,19 +19,7 @@
 #include "RTCMemory.h"
 #include <FS.h>
 
-// Select (uncomment) ONLY ONE file system
-//(NOTE: SPIFFS is deprecated but working)
-#define ESP_LOGGER_FLASH_FS_SPIFFS
-//#define ESP_LOGGER_FLASH_FS_LITTLEFS
-
-#ifdef ESP_LOGGER_FLASH_FS_SPIFFS
-#define ESP_LOGGER_FLASH_FS SPIFFS
-#elif defined(ESP_LOGGER_FLASH_FS_LITTLEFS)
-#define ESP_LOGGER_FLASH_FS LittleFS
-#include <LittleFS.h>
-#endif
-
-RTCMemory::RTCMemory(String path) : ready(false), filePath(path) {}
+RTCMemory::RTCMemory(String path, FS &fs) : ready(false), filePath(path), fileSystem(fs) {}
 
 bool RTCMemory::begin() {
   if (ready) {
@@ -123,12 +111,12 @@ bool RTCMemory::readFromFlash() {
     return false;
   }
 
-  if (!ESP_LOGGER_FLASH_FS.exists(filePath)) {
+  if (!fileSystem.exists(filePath)) {
     if (verbosity > 0) Serial.println("File not existing");
     return false;
   }
 
-  File f = ESP_LOGGER_FLASH_FS.open(filePath, "r");
+  File f = fileSystem.open(filePath, "r");
   if (f) {
     int byteRead = f.read((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
     if (verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
@@ -152,7 +140,7 @@ bool RTCMemory::writeToFlash() {
     return false;
   }
 
-  File f = ESP_LOGGER_FLASH_FS.open(filePath, "w");
+  File f = fileSystem.open(filePath, "w");
   if (f) {
     int n = f.write((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
     f.close();

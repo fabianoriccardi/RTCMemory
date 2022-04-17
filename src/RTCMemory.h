@@ -19,15 +19,19 @@
 #ifndef RTCMEMORY_H
 #define RTCMEMORY_H
 
+#include <LittleFS.h>
+
 #include <Arduino.h>
 #include <type_traits>
 
 class RTCMemory {
 public:
   /**
-   * Create RTCMemory. Set a valid filepath to enable the backup of RTC memory on flash memory.
+   * Create RTCMemory. Provide a valid filepath to enable the backup of RTC memory on flash memory.
+   * By default the library uses LittleFS, but you can select an alternative filesystem such as
+   * SPIFFS.
    */
-  RTCMemory(String path = "");
+  RTCMemory(String path = "", FS &fs = LittleFS);
 
   /**
    * Initialize the buffer using data in RTC memory. If data are invalid, load data from
@@ -108,6 +112,8 @@ private:
   const static int verbosity = 0;
 
   String filePath;
+
+  FS &fileSystem;
 
   /**
    * Load data from flash.

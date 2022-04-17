@@ -23,7 +23,7 @@ void setup() {
 
   // Remember to initialize the SPIFFS memory
   Serial.print("Filesystem initialization... ");
-  if (SPIFFS.begin()) {
+  if (LittleFS.begin()) {
     Serial.println("Done!");
   } else {
     Serial.println("Error");

@@ -31,7 +31,7 @@ void setup() {
 
   // Remember to initialize the flash memory
   Serial.print("Filesystem initialization... ");
-  if (SPIFFS.begin()) {
+  if (LittleFS.begin()) {
     Serial.println("Done!");
   } else {
     Serial.println("Error");
