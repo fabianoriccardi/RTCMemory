@@ -123,22 +123,24 @@ bool RTCMemory::readFromFlash() {
     return false;
   }
 
-  File f;
-  if (ESP_LOGGER_FLASH_FS.exists(filePath)) {
-    f = ESP_LOGGER_FLASH_FS.open(filePath, "r");
-    if (f) {
-      int byteRead = f.read((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
-      if (verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
-      f.close();
-      if (byteRead != TOTAL_RTC_MEMORY_SIZE) { return false; }
-    } else {
-      if (verbosity > 0) Serial.println(String("Error opening file: ") + filePath);
-      return false;
-    }
-  } else {
+  if (!ESP_LOGGER_FLASH_FS.exists(filePath)) {
     if (verbosity > 0) Serial.println("File not existing");
     return false;
   }
+
+  File f = ESP_LOGGER_FLASH_FS.open(filePath, "r");
+  if (f) {
+    int byteRead = f.read((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
+    if (verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
+    f.close();
+    if (byteRead != TOTAL_RTC_MEMORY_SIZE) { return false; }
+    uint32_t crc = calculateCRC32((uint8_t *)&rtcData.data, USER_RTC_MEMORY_SIZE);
+    if (crc != rtcData.crc32) { return false; }
+  } else {
+    if (verbosity > 0) Serial.println(String("Error opening file: ") + filePath);
+    return false;
+  }
+
   return true;
 }
 
@@ -152,13 +154,19 @@ bool RTCMemory::writeToFlash() {
 
   File f = ESP_LOGGER_FLASH_FS.open(filePath, "w");
   if (f) {
-    f.write((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
+    int n = f.write((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
     f.close();
-    return true;
+    if (n == TOTAL_RTC_MEMORY_SIZE) {
+      if (verbosity > 1) Serial.print("Done!");
+      return true;
+    } else {
+      if (verbosity > 0) Serial.println("Cannot write the requested amount of bytes on flash");
+    }
   } else {
     if (verbosity > 0) Serial.println("Error writing file. Is the filesystem initialized?");
     return false;
   }
+  return false;
 }
 
 uint32_t RTCMemory::calculateCRC32(const uint8_t *data, size_t length) const {
