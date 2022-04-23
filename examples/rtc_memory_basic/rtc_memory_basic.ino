@@ -32,11 +32,12 @@ void setup() {
     Serial.println("Initialization done! Previous data found.");
   } else {
     Serial.println("Initialization done! No previous data found. The buffer is cleared.");
-    // Here you can initialize your data structure.
+    // Here you can initialize your data structure
   }
 
   // Get data
   MyData *data = rtcMemory.getData<MyData>();
+  Serial.println(String("Value read: ") + data->counter);
 
   // Modify data
   data->counter++;

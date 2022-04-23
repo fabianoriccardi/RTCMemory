@@ -44,7 +44,7 @@ void setup() {
   }
 
   if (rtcMemory.begin()) {
-    Serial.println("Initialization done! Initialization done! Previous data found.");
+    Serial.println("Initialization done! Previous data found.");
   } else {
     Serial.println("Initialization done! No previous data found. The buffer is cleared.");
     // Here you can initialize your data structure.
@@ -56,7 +56,7 @@ void setup() {
 
   // Modify data
   data->counter++;
-  Serial.println(String("Incremented value: ") + data->counter);
+  Serial.println(String("Value to save: ") + data->counter);
 
   // Persist data in RTC and in flash memory
   // It preserves data even on power loss

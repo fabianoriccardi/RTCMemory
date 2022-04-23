@@ -43,6 +43,8 @@ void setup() {
   Serial.println(String("The initialization had taken: ") + (end - start) + "us");
 
   data = rtcMem.getData<byte>();
+  Serial.println(String("Value read: ") + data[0]);
+
   // Modify data
   data[0]++;
   Serial.println(String("Value to store: ") + data[0]);
