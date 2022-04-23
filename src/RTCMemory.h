@@ -20,12 +20,11 @@
 #define RTCMEMORY_H
 
 #include <LittleFS.h>
-
-#include <Arduino.h>
 #include <type_traits>
 
 /**
- * T is the user data structure, N is the max number of bytes used by this library.
+ * T is the user data structure, N is the max number of bytes used by this library. N acts like a
+ * "soft" limiter.
  */
 template<typename T, int N = 384> class RTCMemory {
 public:
@@ -75,27 +74,35 @@ public:
   T *getData();
 
 private:
+  const static unsigned int BLOCK_SIZE = 4;
+
   /**
-   * Number of bytes requested by the user data structure. This value is ceiled to multiple of 4,
-   * that is the size of RTC memory block.
+   * Number of bytes to contain the user data structure. This value is ceiled to multiple of 4 to
+   * respect the memory alignment of RTC memory.
    */
-  const static int REQUESTED_USER_MEMORY_SIZE = (sizeof(T) - 1) / 4 * 4 + 4;
+  const static unsigned int USER_RTC_MEMORY_SIZE = (sizeof(T) - 1) / BLOCK_SIZE * BLOCK_SIZE + BLOCK_SIZE;
 
   /**
    * Max size of user memory.
    */
-  const static unsigned int USER_RTC_MEMORY_SIZE = 508;
+  const static unsigned int MAX_USER_RTC_MEMORY_SIZE = 508;
 
   /**
-   * Total size of RTC memory (including CRC).
+   * Max size available in RTC memory.
    */
-  const static unsigned int TOTAL_RTC_MEMORY_SIZE = USER_RTC_MEMORY_SIZE + 4;
+  const static unsigned int MAX_TOTAL_RTC_MEMORY_SIZE = 512;
 
   struct RTCData {
     uint32_t crc32;
     // The user buffer
     byte data[USER_RTC_MEMORY_SIZE];
   };
+
+  /**
+   * Offset from the first block in RTC memory. This offset is used to shift data toward the
+   * highest RTC memory addresses.
+   */
+  const static unsigned int OFFSET = (MAX_TOTAL_RTC_MEMORY_SIZE - sizeof(RTCData)) / BLOCK_SIZE;
 
   // The buffer
   RTCData rtcData;
@@ -144,9 +151,11 @@ private:
   void clearBuffer();
 };
 template<typename T, int N>
-RTCMemory<T, N>::RTCMemory(String path, FS &fs) : ready(false), filePath(path), fileSystem(fs) {}
-
-#include <FS.h>
+RTCMemory<T, N>::RTCMemory(String path, FS &fs) : ready(false), filePath(path), fileSystem(fs) {
+  static_assert(sizeof(T) <= MAX_USER_RTC_MEMORY_SIZE, "Error: max size of user data in RTC memory is 508 Byte");
+  static_assert(sizeof(RTCData) <= N,
+                "Error: you reached the max user-defined memory size. You may increase dedicated RTC memory over the default limit of 384 and up to 512 bytes, but you will lose the OTA capability.");
+}
 
 template<typename T, int N> bool RTCMemory<T, N>::begin() {
   if (ready) {
@@ -156,7 +165,7 @@ template<typename T, int N> bool RTCMemory<T, N>::begin() {
 
   if (verbosity > 1) Serial.print("Loading RTC memory... ");
 
-  if (!ESP.rtcUserMemoryRead(0, (uint32_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE)) {
+  if (!ESP.rtcUserMemoryRead(OFFSET, (uint32_t *)&rtcData, sizeof(RTCData))) {
     if (verbosity > 0) Serial.println("Read RTC memory failure");
     return false;
   }
@@ -197,7 +206,7 @@ template<typename T, int N> bool RTCMemory<T, N>::save() {
     uint32_t crcOfData = calculateCRC32((uint8_t *)&rtcData.data, USER_RTC_MEMORY_SIZE);
     rtcData.crc32 = crcOfData;
 
-    if (ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE)) {
+    if (ESP.rtcUserMemoryWrite(OFFSET, (uint32_t *)&rtcData, sizeof(RTCData))) {
       if (verbosity > 1) Serial.println("Write to RTC memory done");
       return true;
     } else {
@@ -230,10 +239,6 @@ template<typename T, int N> bool RTCMemory<T, N>::persist() {
 }
 
 template<typename T, int N> T *RTCMemory<T, N>::getData() {
-  static_assert(sizeof(T) <= sizeof(TOTAL_RTC_MEMORY_SIZE), "Error: max size of user data in RTC memory is 508 Byte");
-  static_assert(REQUESTED_USER_MEMORY_SIZE <= N - 4,
-                "Error: you reached the max user-defined memory size. You may increase dedicated RTC memory over the default limit of 384 and up to 512 bytes, but you will lose the OTA capability.");
-
   if (ready) { return reinterpret_cast<T *>(rtcData.data); }
 
   if (verbosity > 0) Serial.println("Call init before other calls!");
@@ -255,10 +260,10 @@ template<typename T, int N> bool RTCMemory<T, N>::readFromFlash() {
 
   File f = fileSystem.open(filePath, "r");
   if (f) {
-    int byteRead = f.read((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
+    int byteRead = f.read((uint8_t *)&rtcData, sizeof(RTCData));
     if (verbosity > 1) Serial.println(String("Bytes read:") + byteRead);
     f.close();
-    if (byteRead != TOTAL_RTC_MEMORY_SIZE) { return false; }
+    if (byteRead != sizeof(RTCData)) { return false; }
     uint32_t crc = calculateCRC32((uint8_t *)&rtcData.data, USER_RTC_MEMORY_SIZE);
     if (crc != rtcData.crc32) { return false; }
   } else {
@@ -279,9 +284,9 @@ template<typename T, int N> bool RTCMemory<T, N>::writeToFlash() {
 
   File f = fileSystem.open(filePath, "w");
   if (f) {
-    int n = f.write((uint8_t *)&rtcData, TOTAL_RTC_MEMORY_SIZE);
+    int n = f.write((uint8_t *)&rtcData, sizeof(RTCData));
     f.close();
-    if (n == TOTAL_RTC_MEMORY_SIZE) {
+    if (n == sizeof(RTCData)) {
       if (verbosity > 1) Serial.print("Done!");
       return true;
     } else {
@@ -309,7 +314,7 @@ template<typename T, int N> uint32_t RTCMemory<T, N>::calculateCRC32(const uint8
 }
 
 template<typename T, int N> void RTCMemory<T, N>::clearBuffer() {
-  memset((void *)&rtcData, 0, TOTAL_RTC_MEMORY_SIZE);
+  memset((void *)&rtcData.data, 0, USER_RTC_MEMORY_SIZE);
   uint32_t result = calculateCRC32((uint8_t *)rtcData.data, USER_RTC_MEMORY_SIZE);
   rtcData.crc32 = result;
 }
