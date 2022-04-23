@@ -10,7 +10,7 @@ typedef struct {
   int counter;
 } MyData;
 
-RTCMemory rtcMemory;
+RTCMemory<MyData> rtcMemory;
 
 void setup() {
   Serial.begin(115200);
@@ -36,7 +36,7 @@ void setup() {
   }
 
   // Get data
-  MyData *data = rtcMemory.getData<MyData>();
+  MyData *data = rtcMemory.getData();
   Serial.println(String("Value read: ") + data->counter);
 
   // Modify data

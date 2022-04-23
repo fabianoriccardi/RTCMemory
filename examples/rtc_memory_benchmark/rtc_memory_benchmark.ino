@@ -31,8 +31,8 @@ void setup() {
 
   unsigned long start, end;
 
-  RTCMemory rtcMem("/etc/rtc_mem.bin");
-  byte *data = rtcMem.getData<byte>();
+  RTCMemory<byte> rtcMem("/etc/rtc_mem.bin");
+  byte *data = rtcMem.getData();
   if (data == nullptr) {
     Serial.println("OK: here nullptr is expected, you have to initialize the instance explicitly");
   }
@@ -42,7 +42,7 @@ void setup() {
   end = micros();
   Serial.println(String("The initialization had taken: ") + (end - start) + "us");
 
-  data = rtcMem.getData<byte>();
+  data = rtcMem.getData();
   Serial.println(String("Value read: ") + data[0]);
 
   // Modify data

@@ -11,7 +11,7 @@ typedef struct {
   int counter;
 } MyData;
 
-RTCMemory rtcMemory("/etc/rtc_mem.bin");
+RTCMemory<MyData> rtcMemory("/etc/rtc_mem.bin");
 
 void setup() {
   Serial.begin(115200);
@@ -37,7 +37,7 @@ void setup() {
     Serial.println("Error");
   }
 
-  MyData *data = rtcMemory.getData<MyData>();
+  MyData *data = rtcMemory.getData();
 
   if (data == nullptr) {
     Serial.println("OK: here nullptr is expected, you have to initialize the instance explicitly");
@@ -51,7 +51,7 @@ void setup() {
   }
 
   // Get the data
-  data = rtcMemory.getData<MyData>();
+  data = rtcMemory.getData();
   Serial.println(String("Value read: ") + data->counter);
 
   // Modify data
