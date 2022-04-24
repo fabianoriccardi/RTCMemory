@@ -1,5 +1,5 @@
 # This is the name of the workflow, visible on GitHub UI
-name: Test Library's Examples
+name: Compile Library's Examples
 on:
   push: # see: https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request
     paths:
@@ -11,14 +11,14 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.arduino-platform }} - test compiling examples
+    name: Compile for ${{ matrix.arduino-platform }}
 
     # Target OS
     runs-on: ubuntu-20.04
 
     env:
       # Comma separated list without double quotes around the list
-      REQUIRED_LIBRARIES: RTCMemory
+      REQUIRED_LIBRARIES:
 
     strategy:
       # The Matrix contains all the configuration to be tested. For each configuration, all the examples are tested
@@ -26,8 +26,10 @@ jobs:
 
         # A couple of configuration for testing the library
         arduino-platform:
-          - esp8266:esp8266@2.7.4
-          - esp8266:esp8266@3.0.0
+          # The oldest version compatible with RTCMemory 2.x
+          - esp8266:esp8266@2.6.0
+          # The newest version compatible with RTCMemory 2.x
+          - esp8266:esp8266@3.0.2
 
         platform-url:
           - https://arduino.esp8266.com/stable/package_esp8266com_index.json
@@ -53,7 +55,8 @@ jobs:
           library-manager: update
 
       - name: Compile all examples using the arduino-test-compile action
-        uses: ArminJo/arduino-test-compile@v3.0.0
+        # Specify the git tag, not the Github release
+        uses: ArminJo/arduino-test-compile@v3.2.0
         with:
           arduino-board-fqbn: ${{ matrix.arduino-boards-fqbn }}
           arduino-platform: ${{ matrix.arduino-platform }}
