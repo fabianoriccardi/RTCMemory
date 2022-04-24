@@ -2,7 +2,6 @@
  * Benchmark and test the APIs offered by RTCMemory.
  * It shows the different speeds provided by RTC and flash memory.
  ***********************************************************************/
-#include <FS.h>
 #include <RTCMemory.h>
 
 void setup() {

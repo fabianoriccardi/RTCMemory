@@ -152,9 +152,12 @@ private:
 };
 template<typename T, int N>
 RTCMemory<T, N>::RTCMemory(String path, FS &fs) : ready(false), filePath(path), fileSystem(fs) {
-  static_assert(sizeof(T) <= MAX_USER_RTC_MEMORY_SIZE, "Error: max size of user data in RTC memory is 508 Byte");
-  static_assert(sizeof(RTCData) <= N,
-                "Error: you reached the max user-defined memory size. You may increase dedicated RTC memory over the default limit of 384 and up to 512 bytes, but you will lose the OTA capability.");
+  static_assert(sizeof(T) <= MAX_USER_RTC_MEMORY_SIZE, "Error: max size of user data in RTC memory "
+                                                       "is 508 Byte");
+  static_assert(sizeof(RTCData) <= N, "Error: you reached the max user-defined memory size. You "
+                                      "may increase dedicated RTC memory over the default limit of "
+                                      "384 and up to 512 bytes, but you will lose the OTA "
+                                      "capability.");
 }
 
 template<typename T, int N> bool RTCMemory<T, N>::begin() {

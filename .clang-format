@@ -3,6 +3,7 @@
 # - ReflowComments: true
 # - MaxEmptyLinesToKeep: 1
 # - ColumnLimit: 100
+# - BreakStringLiterals: true
 
 Language: Cpp
 # LLVM is the default style setting, used when a configuration option is not set here
@@ -59,7 +60,7 @@ BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-BreakStringLiterals: false
+BreakStringLiterals: true
 ColumnLimit: 100
 # "" matches none
 CommentPragmas: ""

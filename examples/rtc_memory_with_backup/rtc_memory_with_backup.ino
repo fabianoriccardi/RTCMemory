@@ -2,7 +2,6 @@
  * This sketch shows how to store and retrieve a variable from
  * RTC memory and how to backup it on flash memory.
  ********************************************************************/
-#include <FS.h>
 #include <RTCMemory.h>
 
 // Define a struct that maps what's inside the RTC memory
