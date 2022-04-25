@@ -5,7 +5,7 @@
         "name": "Fabiano Riccardi",
         "email": "fabiano.riccardi@outlook.com"
     },
-    "description": "An intuitive library to simplify read and write operations on RTC Memory of ESP8266 and backup on flash memory.",
+    "description": "An intuitive library to simplify read and write operations on RTC memory of ESP8266 and its backup on flash memory.",
     "keywords": [
         "rtc-memory",
         "esp8266",

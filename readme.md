@@ -1,6 +1,6 @@
 # RTCMemory
 
-[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabianoriccardi/rtc-memory-esp8266/actions/workflows/CompileLibraryExamples.yml/badge.svg)
+[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabianoriccardi/RTCMemory/actions/workflows/CompileLibraryExamples.yml/badge.svg)
 
 RTCMemory is a library to ease the access to the RTC memory embedded in ESP8266.
 
@@ -50,7 +50,7 @@ the filepath is an optional parameter, if you don't need the backup on flash mem
 
 `result` is true if there are valid data in RTC memory or in flash memory, otherwise is false.
 
-> ::memo:: **Note:** Remember to initialize the file system before calling begin().
+> :memo: **Note:** Remember to initialize the file system before calling begin().
 
 Get the pointer to the buffer containing your data:
 
@@ -74,7 +74,7 @@ The following diagram illustrates the global RTC memory layout.
 
 ![RTC memory layout](extras/rtc_memory_layout.drawio.png "RTC memory layout")
 
-Note that the RTCMemory data are always *shifted* toward the highest addresses of the RTC memory.
+Note that the RTCMemory data are always *shifted* toward the highest addresses of the RTC memory, so that the reserved memory expands toward the lower addresses.
 
 ## About the file system
 
