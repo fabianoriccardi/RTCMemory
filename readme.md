@@ -1,6 +1,6 @@
 # RTCMemory
 
-[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/badge/RTCMemory.svg) ![Compile Library Examples](https://github.com/fabianoriccardi/RTCMemory/actions/workflows/CompileLibraryExamples.yml/badge.svg)
+[![arduino-library-badge](https://www.ardu-badge.com/badge/RTCMemory.svg)](https://www.ardu-badge.com/RTCMemory) ![Compile Library Examples](https://github.com/fabianoriccardi/RTCMemory/actions/workflows/CompileLibraryExamples.yml/badge.svg)
 
 RTCMemory is a library to ease the access to the RTC memory embedded in ESP8266.
 
